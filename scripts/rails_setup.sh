@@ -46,6 +46,9 @@ if [ $(uname) = "Linux" ]; then
   sudo apt-get install curl bundler postgresql-common postgresql-9.3 libpq-dev \
     libgdbm-dev libncurses5-dev automake libtool bison libffi-dev \
     libqtwebkit-dev nodejs nodejs-legacy npm
+  if [ -n "$HEADLESS" ]; then
+      sudo apt-get install -y xvfb
+  fi
 
 elif [ $(uname) = "Darwin" ]; then
   if ! hash brew 2>/dev/null; then
@@ -59,7 +62,7 @@ elif [ $(uname) = "Darwin" ]; then
   brew install node
 fi
 
-if [ -n $WITH_PHANTOMJS ]; then
+if [ -n "$WITH_PHANTOMJS" ]; then
   sudo npm install -g phantomjs
 fi
 
@@ -75,7 +78,7 @@ else
 fi
 echo
 
-if [ -n $REQUIRED_RUBY ]; then
+if [ -n "$REQUIRED_RUBY" ]; then
   if ! rvm list | grep $REQUIRED_RUBY; then
     echo "Installing ruby-$REQUIRED_RUBY"
     rvm install $REQUIRED_RUBY
