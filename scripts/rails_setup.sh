@@ -108,12 +108,12 @@ if hash rbenv 2>/dev/null; then
       rbenv install $REQUIRED_RUBY
     fi
     echo "$REQUIRED_RUBY" > .ruby-version
-    echo "agileventures" > .rbenv-gemsets
+    echo "$GEMSET" > .rbenv-gemsets
   else
     wget https://raw.githubusercontent.com/neosb/rbenv-install/master/rbenv-install
     if ! ls -la ~/.rbenv/plugins/rbenv-gems &> /dev/null; then
       source rbenv-install --only-rbenv-gemset
-      echo "agileventures" > .rbenv-gemsets
+      echo "$GEMSET" > .rbenv-gemsets
     fi
     if ! ls -la ~/.rbenv/plugins/rbenv-gems &> /dev/null; then
       source rbenv-install --only-ruby-build
