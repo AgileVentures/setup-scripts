@@ -103,7 +103,7 @@ echo "
 # Only if rbenv is present install plugins
 if hash rbenv 2>/dev/null; then
   if ls -la ~/.rbenv/plugins/ruby-build &> /dev/null && \
-    ls -la ~/.rbenv/plugins/rbenv-gems &> /dev/null; then
+    ls -la ~/.rbenv/plugins/rbenv-gemset &> /dev/null; then
     if ! rbenv versions | grep $REQUIRED_RUBY; then
       rbenv install $REQUIRED_RUBY
     fi
@@ -111,11 +111,11 @@ if hash rbenv 2>/dev/null; then
     echo "$GEMSET" > .rbenv-gemsets
   else
     wget https://raw.githubusercontent.com/neosb/rbenv-install/master/rbenv-install
-    if ! ls -la ~/.rbenv/plugins/rbenv-gems &> /dev/null; then
+    if ! ls -la ~/.rbenv/plugins/rbenv-gemset &> /dev/null; then
       source rbenv-install --only-rbenv-gemset
       echo "$GEMSET" > .rbenv-gemsets
     fi
-    if ! ls -la ~/.rbenv/plugins/rbenv-gems &> /dev/null; then
+    if ! ls -la ~/.rbenv/plugins/ruby-build &> /dev/null; then
       source rbenv-install --only-ruby-build
       rbenv install $REQUIRED_RUBY
       echo "$REQUIRED_RUBY" > .ruby-version
