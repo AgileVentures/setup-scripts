@@ -66,18 +66,8 @@ if [ -n "$WITH_PHANTOMJS" ]; then
   sudo npm install -g phantomjs
 fi
 
-
-echo "
-########################### Ruby ##################################
-"
-if hash rvm 2>/dev/null; then
-  rvm get stable
-else
-  \curl -sSL https://get.rvm.io | bash -s stable --ruby --auto-dotfiles
-  source ~/.rvm/scripts/rvm
-fi
-echo
-
+# Setup rvm environment
+function rvm-only {
 if [ -n "$REQUIRED_RUBY" ]; then
   if ! rvm list | grep $REQUIRED_RUBY; then
     echo "Installing ruby-$REQUIRED_RUBY"
@@ -103,6 +93,43 @@ if [ -n "$REQUIRED_RUBY" ]; then
     echo
   fi
 fi
+}
+
+echo "
+########################### Ruby ##################################
+"
+# Check if rbenv or rvm is installed
+# Does not imply installing rbenv,
+# Only if rbenv is present install plugins
+if hash rbenv 2>/dev/null; then
+  if ls -la ~/.rbenv/plugins/ruby-build &> /dev/null && \
+    ls -la ~/.rbenv/plugins/rbenv-gems &> /dev/null; then
+    if ! rbenv versions | grep $REQUIRED_RUBY; then
+      rbenv install $REQUIRED_RUBY
+    fi
+    echo "$REQUIRED_RUBY" > .ruby-version
+    echo "agileventures" > .rbenv-gemsets
+  else
+    wget https://raw.githubusercontent.com/neosb/rbenv-install/master/rbenv-install
+    if ! ls -la ~/.rbenv/plugins/rbenv-gems &> /dev/null; then
+      source rbenv-install --only-rbenv-gemset
+      echo "agileventures" > .rbenv-gemsets
+    fi
+    if ! ls -la ~/.rbenv/plugins/rbenv-gems &> /dev/null; then
+      source rbenv-install --only-ruby-build
+      rbenv install $REQUIRED_RUBY
+      echo "$REQUIRED_RUBY" > .ruby-version
+    fi
+  fi
+elif hash rvm 2>/dev/null; then
+  rvm get stable
+  rvm-only
+else
+  \curl -sSL https://get.rvm.io | bash -s stable --ruby --auto-dotfiles
+  source ~/.rvm/scripts/rvm
+  rvm-only
+fi
+echo
 
 if [ -z $SKIP_BUNDLE ]; then
   bundle install
