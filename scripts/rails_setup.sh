@@ -43,9 +43,10 @@ echo "
 "
 if [ $(uname) = "Linux" ]; then
   sudo apt-get update
-  sudo apt-get install curl bundler postgresql-common postgresql-9.3 libpq-dev \
+  sudo apt-get install curl postgresql-common postgresql-9.3 libpq-dev \
     libgdbm-dev libncurses5-dev automake libtool bison libffi-dev \
-    libqtwebkit-dev nodejs nodejs-legacy npm
+    libqtwebkit-dev \
+    nodejs # npm nodejs-dev conflicts with nodejs as it contains them (14.04)
   if [ -n "$HEADLESS" ]; then
       sudo apt-get install -y xvfb
   fi
@@ -63,9 +64,12 @@ elif [ $(uname) = "Darwin" ]; then
 fi
 
 if [ -n "$WITH_PHANTOMJS" ]; then
-  sudo npm install -g phantomjs
+  sudo npm install -g phantomjs # need sudo
 fi
 
+echo "
+########################### Ruby ##################################
+"
 # Setup rvm environment
 function rvm-only {
 if [ -n "$REQUIRED_RUBY" ]; then
@@ -95,21 +99,23 @@ if [ -n "$REQUIRED_RUBY" ]; then
 fi
 }
 
-echo "
-########################### Ruby ##################################
-"
 # Check if rbenv or rvm is installed
 # Does not imply installing rbenv,
 # Only if rbenv is present install plugins
 if hash rbenv 2>/dev/null; then
+  # Ruby fails to build, falling back to new version
+  if [ $REQUIRED_RUBY=="2.1.1" ]; then
+    REQUIRED_RUBY="2.1.2"
+  fi
   if ls -la ~/.rbenv/plugins/ruby-build &> /dev/null && \
     ls -la ~/.rbenv/plugins/rbenv-gemset &> /dev/null; then
     if ! rbenv versions | grep $REQUIRED_RUBY; then
-      rbenv install $REQUIRED_RUBY
+      rbenv install -v $REQUIRED_RUBY
     fi
     echo "$REQUIRED_RUBY" > .ruby-version
     echo "$GEMSET" > .rbenv-gemsets
   else
+    # Use custom installation script
     wget https://raw.githubusercontent.com/neosb/rbenv-install/master/rbenv-install
     if ! ls -la ~/.rbenv/plugins/rbenv-gemset &> /dev/null; then
       source rbenv-install --only-rbenv-gemset
@@ -117,9 +123,11 @@ if hash rbenv 2>/dev/null; then
     fi
     if ! ls -la ~/.rbenv/plugins/ruby-build &> /dev/null; then
       source rbenv-install --only-ruby-build
-      rbenv install $REQUIRED_RUBY
+      rbenv install -v $REQUIRED_RUBY
       echo "$REQUIRED_RUBY" > .ruby-version
     fi
+    # Cleanup
+    rm rbenv-install
   fi
 elif hash rvm 2>/dev/null; then
   rvm get stable
@@ -130,6 +138,13 @@ else
   rvm-only
 fi
 echo
+
+# Set Gemfile to reflect installed Ruby version (needed to fallaback to 2.1.2)
+sed -i "1 c\
+ruby '$REQUIRED_RUBY'" Gemfile
+
+# Install Bundler as a gem otherwise will install older Ruby version before 2.0
+gem install bundler
 
 if [ -z $SKIP_BUNDLE ]; then
   bundle install
