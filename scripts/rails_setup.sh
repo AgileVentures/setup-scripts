@@ -50,6 +50,7 @@ if [ $(uname) = "Linux" ]; then
   if [ -n "$HEADLESS" ]; then
       sudo apt-get install -y xvfb
   fi
+  sudo ln -s `which nodejs` /usr/bin/node
 
 elif [ $(uname) = "Darwin" ]; then
   if ! hash brew 2>/dev/null; then
