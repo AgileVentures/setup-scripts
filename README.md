@@ -15,6 +15,7 @@ used throughout AgileVentures projects. This includes the following tools:
 * [curl](http://curl.haxx.se/)
 * [bundler](http://bundler.io/)
 * [RVM](https://rvm.io/)
+* Support for existing [rbenv](https://github.com/sstephenson/rbenv/) users
 * [nodejs](http://nodejs.org/) and [npm](https://www.npmjs.org/)
 * Options:
  - `$REQUIRED_RUBY` - specifies the required ruby version
