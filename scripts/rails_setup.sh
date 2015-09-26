@@ -41,7 +41,8 @@ read -s
 echo "
 ####################### DEPENDENCIES ##############################
 "
-if [ $(uname) = "Linux" ]; then
+
+if [ $(uname) = "Linux" ] && [ $(gawk -F= '(/^ID/ && !/^ID_/){print $2}' /etc/os-release) = 'ubuntu' ]; then
   sudo apt-get update
   sudo apt-get install curl bundler postgresql-common postgresql-9.3 libpq-dev \
     libgdbm-dev libncurses5-dev automake libtool bison libffi-dev \
@@ -60,6 +61,9 @@ elif [ $(uname) = "Darwin" ]; then
   brew install qt
   brew install postgresql
   brew install node
+else
+ echo "Not supported system, please resolve dependecy manually"   
+ return 1
 fi
 
 if [ -n "$WITH_PHANTOMJS" ]; then
