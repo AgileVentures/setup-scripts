@@ -43,7 +43,7 @@ echo "
 "
 if [ $(uname) = "Linux" ]; then
   # protentially apt-get is not supported
-  sudo apt-get
+  sudo apt-get -h
   if [ $(echo $?) = 0 ]; then
      sudo apt-get update
      sudo apt-get install curl bundler postgresql-common postgresql-9.3 libpq-dev \
