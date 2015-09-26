@@ -42,14 +42,21 @@ echo "
 ####################### DEPENDENCIES ##############################
 "
 if [ $(uname) = "Linux" ]; then
-  sudo apt-get update
-  sudo apt-get install curl bundler postgresql-common postgresql-9.3 libpq-dev \
-    libgdbm-dev libncurses5-dev automake libtool bison libffi-dev \
-    libqtwebkit-dev nodejs nodejs-legacy npm
-  if [ -n "$HEADLESS" ]; then
-      sudo apt-get install -y xvfb
+  # protentially apt-get is not supported
+  sudo apt-get
+  if [ $(echo $?) = 0 ]; then
+     sudo apt-get update
+     sudo apt-get install curl bundler postgresql-common postgresql-9.3 libpq-dev \
+       libgdbm-dev libncurses5-dev automake libtool bison libffi-dev \
+       libqtwebkit-dev nodejs nodejs-legacy npm
+     if [ -n "$HEADLESS" ]; then
+       sudo apt-get install -y xvfb
+     fi
+  else
+    echo "Not supported linux system, please resolve dependecy manually"   
+    return 1
   fi
-
+  
 elif [ $(uname) = "Darwin" ]; then
   if ! hash brew 2>/dev/null; then
     ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
